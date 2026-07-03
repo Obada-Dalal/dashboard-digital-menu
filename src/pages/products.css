@@ -687,4 +687,7 @@
     gap: 5px;
     padding: 10px;
   }
+  .add-products{
+    gap: 1px;
+  }
 }

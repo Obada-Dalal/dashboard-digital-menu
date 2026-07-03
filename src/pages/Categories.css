@@ -453,4 +453,11 @@
     flex-direction: column;
     width: 47%;
   }
+  .header-categories {
+    gap: 5px;
+  }
+  .box-cat .image {
+    width: 110px;
+    height: 110px;
+  }
 }
