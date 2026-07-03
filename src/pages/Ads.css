@@ -1,0 +1,319 @@
+/* ---------- حاوية الإعلانات ---------- */
+.ads-container {
+  padding: 10px;
+}
+
+.ads-loading {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 50px;
+  color: var(--text-dark);
+}
+
+/* ---------- رأس الصفحة ---------- */
+.ads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.ads-page-title {
+  font-size: 1.8rem;
+  color: var(--text-dark);
+}
+
+.ads-add-btn {
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: var(--text-light);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  box-shadow: var(--btn-shadow);
+}
+
+.ads-add-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  box-shadow: var(--shadow-hover);
+}
+
+.ads-add-btn:active {
+  transform: translateY(2px);
+  box-shadow: var(--shadow-active);
+}
+
+/* ---------- شبكة البطاقات ---------- */
+.ads-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* ---------- بطاقة الإعلان ---------- */
+.ad-card {
+  background-color: var(--text-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  width: 220px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.ad-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+.ad-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.ad-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ad-info {
+  padding: 12px 15px;
+  text-align: center;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.ad-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+  border-top: 1px solid var(--background);
+}
+
+.ad-delete-btn {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #dc2626;
+}
+
+.ad-delete-btn:hover {
+  color: #b91c1c;
+  transform: scale(1.2);
+}
+
+/* ---------- المودال ---------- */
+.ad-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  box-shadow: var(--shadow-overlay);
+}
+
+.ad-modal-content {
+  background-color: var(--text-light);
+  padding: 25px;
+  border-radius: 16px;
+  width: 380px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* ---------- منطقة رفع الصورة ---------- */
+.ad-image-upload-area {
+  border: 2px dashed var(--primary);
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin-bottom: 25px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.ad-image-upload-area:hover {
+  border-color: var(--accent);
+  background-color: var(--background);
+}
+
+.ad-image-upload-area.has-image {
+  border: 2px solid var(--primary);
+  padding: 10px;
+}
+
+.ad-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.ad-upload-icon {
+  font-size: 3rem;
+  color: var(--primary);
+}
+
+.ad-upload-text {
+  color: var(--text-dark);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.ad-upload-hint {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+/* معاينة الصورة */
+.ad-preview-label {
+  cursor: pointer;
+}
+
+.ad-preview-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ad-preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.ad-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 41, 55, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 10px;
+  pointer-events: none;
+  box-shadow: var(--shadow-overlay);
+}
+
+.ad-preview-image-wrapper:hover .ad-image-overlay {
+  opacity: 1;
+}
+
+.ad-overlay-icon {
+  font-size: 2rem;
+  color: var(--text-light);
+  background: var(--primary);
+  padding: 6px;
+  border-radius: 50%;
+}
+
+.ad-overlay-text {
+  color: var(--text-light);
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+/* ---------- حقول المودال ---------- */
+.ad-form-group {
+  margin-bottom: 20px;
+}
+
+.ad-form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.ad-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.ad-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+  outline: none;
+}
+
+.ad-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ad-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.ad-save-btn,
+.ad-close-btn {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+.ad-save-btn {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: var(--text-light);
+  box-shadow: var(--btn-shadow);
+}
+
+.ad-save-btn:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-hover);
+}
+
+.ad-close-btn {
+  background: #dc2626;
+  color: var(--text-light);
+}
+
+.ad-close-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+}

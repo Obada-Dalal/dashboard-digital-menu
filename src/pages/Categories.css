@@ -1,0 +1,344 @@
+.header-categories {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: var(--text-light);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+    gap: 15px;
+    direction: ltr;
+}
+
+.header-categories .add-categories {
+    border: none;
+    padding: 12px 24px;
+    font-size: 15px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    box-shadow: var(--btn-shadow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.header-categories .add-categories:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--accent), var(--primary));
+  box-shadow: var(--shadow-hover);
+}
+
+.header-categories .add-categories:active {
+  transform: translateY(2px);
+  box-shadow: var(--shadow-active);
+}
+
+.header-categories h2 {
+  font-size: 20px;
+  color: var(--text-dark);
+}
+
+.all-box {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.box-cat {
+  background-color: var(--text-light);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.box-cat:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.box-cat .image {
+  width: 125px;
+  height: 125px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+}
+
+.box-cat .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.box-cat .name-cat {
+  font-weight: 600;
+  text-align: center;
+  margin: 10px 0px;
+  font-size: 18px;
+  color: var(--text-dark);
+}
+
+.box-cat .icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.box-cat .icons button {
+  border: none;
+  background: none;
+  transition: all 0.3s ease;
+}
+
+.box-cat .icons .delete {
+  color: #dc2626;
+}
+
+.box-cat .icons .edit {
+  color: var(--primary);
+}
+
+.box-cat .icons .delete,
+.box-cat .icons .edit {
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.box-cat .icons .delete:hover {
+  transform: scale(1.2);
+  color: #b91c1c;
+}
+
+.box-cat .icons .edit:hover {
+  transform: scale(1.2);
+  color: var(--accent);
+}
+
+/* قسم اضافة صنف */
+.modal-overlay,
+.edit-categories-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: var(--shadow-overlay);
+}
+
+.modal-content {
+  background-color: var(--text-light);
+  padding: 25px;
+  border-radius: 16px;
+  width: 350px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.image-upload-area {
+  border: 2px dashed var(--primary);
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.image-upload-area:hover {
+  border-color: var(--accent);
+  background-color: var(--background);
+}
+
+.image-upload-area.has-image {
+  padding: 10px;
+  border: 2px solid var(--primary);
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.checked-img {
+  color: var(--secondary);
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: var(--primary);
+}
+
+.upload-hint {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.preview-label {
+  position: relative;
+  cursor: pointer;
+}
+
+.preview-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+  display: block;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 41, 55, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 6px;
+  cursor: pointer;
+  pointer-events: none !important;
+  box-shadow: var(--shadow-overlay);
+}
+
+.preview-image-wrapper:hover .image-overlay {
+  opacity: 1;
+}
+
+.overlay-icon {
+  font-size: 2rem;
+  color: var(--text-light);
+  background: var(--primary);
+  padding: 6px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+}
+
+.overlay-text {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.image-overlay {
+  pointer-events: none;
+}
+
+.text {
+  margin-bottom: 20px;
+}
+
+.text span {
+  margin: 5px 0px;
+  display: block;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.text input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.text input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.buttons button {
+  padding: 10px 25px;
+  color: var(--text-light);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  font-weight: 600;
+}
+
+.buttons .btn-save {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  box-shadow: var(--btn-shadow);
+}
+
+.buttons .btn-save:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-hover);
+}
+
+.buttons .btn-close {
+  background: #dc2626;
+}
+
+.buttons .btn-close:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+}
+
+/* edit-categories-content */
+.edit-categories-content {
+  background-color: var(--text-light);
+}
+@media (max-width:600px) {
+  .box-cat{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+  }
+}
