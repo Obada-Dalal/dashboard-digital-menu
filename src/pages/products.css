@@ -575,6 +575,102 @@
   color: var(--text-dark);
 }
 
+/* ===== مودال تأكيد الحذف ===== */
+.confirm-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 35px 30px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: confirmIn 0.3s ease-out;
+}
+
+@keyframes confirmIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirm-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #fef3c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+.confirm-title {
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin: 0 0 10px;
+  direction: rtl;
+}
+
+.confirm-text {
+  color: #64748b;
+  margin: 0 0 8px;
+  direction: rtl;
+  font-size: 15px;
+}
+
+.confirm-warning {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 0 0 25px;
+  direction: rtl;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-btn-delete {
+  flex: 1;
+  padding: 12px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.confirm-btn-delete:hover {
+  background: #b91c1c;
+}
+
+.confirm-btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: #e2e8f0;
+  color: #1f2937;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.confirm-btn-cancel:hover {
+  background: #cbd5e1;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .main-products {
@@ -582,7 +678,7 @@
     gap: 12px;
   }
   .product-image {
-    height: 160px;
+    height: 250px;
   }
   .modal-content {
     padding: 20px;

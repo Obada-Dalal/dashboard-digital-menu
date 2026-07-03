@@ -1,22 +1,32 @@
 import { useEffect, useState, useCallback } from "react";
 import api from "../services/api";
+import toast from "react-hot-toast";
 import "./Categories.css";
-
 import { MdDeleteForever } from "react-icons/md";
 import { MdOutlineEditNote } from "react-icons/md";
-import { FaImage } from "react-icons/fa";
-import { FaEdit } from "react-icons/fa";
+import {
+  FaImage,
+  FaEdit,
+  FaSpinner,
+  FaExclamationTriangle
+} from "react-icons/fa";
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
-  const [editingCat, setEditingCat] = useState(null); // التصنيف الجاري تعديله
-  
+  const [editingCat, setEditingCat] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // ✨ حالات مودال التأكيد
+  const [confirmDelete, setConfirmDelete] = useState(null);
+
   const fetchCategories = useCallback(async () => {
     try {
       const res = await api.get("/categories");
       setCategories(res.data);
+    // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      console.error(err);
+      toast.error("فشل في تحميل التصنيفات");
     } finally {
       setLoading(false);
     }
@@ -27,15 +37,12 @@ export default function Categories() {
     fetchCategories();
   }, [fetchCategories]);
 
-  // حالة النافذة
   const [showModal, setShowModal] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [name, setName] = useState("");
   const [fileInputKey, setFileInputKey] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-  // فتح النافذة للإضافة
   const openModal = () => {
     setEditingCat(null);
     setShowModal(true);
@@ -45,13 +52,12 @@ export default function Categories() {
     setFileInputKey((prev) => prev + 1);
   };
 
-  // فتح النافذة للتعديل
   const handleEdit = (cat) => {
     setEditingCat(cat);
     setShowModal(true);
     setName(cat.name);
-    setImagePreview(cat.imageUrl); // عرض الصورة الحالية
-    setImageFile(null); // لم نختر ملفًا بعد
+    setImagePreview(cat.imageUrl);
+    setImageFile(null);
     setFileInputKey((prev) => prev + 1);
   };
 
@@ -64,64 +70,74 @@ export default function Categories() {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // ✨ فتح مودال التأكيد
+  const handleDeleteClick = (cat) => {
+    setConfirmDelete(cat);
+  };
+
+  // ✨ تأكيد الحذف
+  const handleConfirmDelete = async () => {
+    try {
+      await api.delete(`/categories/${confirmDelete.name}`);
+      setCategories(categories.filter((c) => c._id !== confirmDelete._id));
+      toast.success(`تم حذف "${confirmDelete.name}" بنجاح`);
+      // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      toast.error("فشل في حذف التصنيف");
+    } finally {
+      setConfirmDelete(null);
     }
   };
 
   const handleSave = async () => {
-    // التحقق من الحقول (في حالة التعديل قد لا نغير الصورة)
     if (editingCat) {
-      // في التعديل: لا بد من وجود اسم
-      if (name.trim() === "") {
-        alert("الرجاء إدخال اسم الصنف");
-        return;
-      }
+      if (name.trim() === "") return toast.error("الرجاء إدخال اسم الصنف");
     } else {
-      // في الإضافة: لا بد من اسم + صورة
-      if (!imageFile || name.trim() === "") {
-        alert("الرجاء اختيار صورة وإدخال اسم الصنف");
-        return;
-      }
+      if (!imageFile || name.trim() === "")
+        return toast.error("الرجاء اختيار صورة وإدخال اسم الصنف");
     }
 
     const formData = new FormData();
     formData.append("name", name);
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
+    if (imageFile) formData.append("image", imageFile);
 
+    setSaving(true);
     try {
       if (editingCat) {
-        // تحديث تصنيف موجود
         const res = await api.put(`/categories/${editingCat._id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         setCategories(
           categories.map((c) => (c._id === editingCat._id ? res.data : c))
         );
+        toast.success("تم تعديل التصنيف بنجاح");
       } else {
-        // إضافة جديد
         const res = await api.post("/categories", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         setCategories([...categories, res.data]);
+        toast.success("تم إضافة التصنيف بنجاح");
       }
       closeModal();
     } catch (err) {
-      console.error(err);
-      alert("فشل في حفظ الصنف");
+      toast.error(err.response?.data?.error || "فشل في حفظ التصنيف");
+    } finally {
+      setSaving(false);
     }
   };
 
   if (loading)
-    return <div className="loading-text">جاري تحميل المنتجات...</div>;
+    return <div className="loading-text">جاري تحميل التصنيفات...</div>;
 
   return (
     <div className="categories">
       <div className="header-categories">
         <button onClick={openModal} className="add-categories">
-          اضافة صنف +{" "}
+          اضافة صنف +
         </button>
         <h2>الأصناف</h2>
       </div>
@@ -134,13 +150,7 @@ export default function Categories() {
             </div>
             <div className="name-cat">{cat.name}</div>
             <div className="icons">
-              <button
-                className="delete"
-                onClick={async () => {
-                  await api.delete(`/categories/${cat.name}`);
-                  setCategories(categories.filter((c) => c._id !== cat._id));
-                }}
-              >
+              <button className="delete" onClick={() => handleDeleteClick(cat)}>
                 <MdDeleteForever />
               </button>
               <button className="edit" onClick={() => handleEdit(cat)}>
@@ -151,6 +161,37 @@ export default function Categories() {
         ))}
       </div>
 
+      {/* ✨ مودال تأكيد الحذف */}
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={() => setConfirmDelete(null)}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-icon">
+              <FaExclamationTriangle />
+            </div>
+            <h3 className="confirm-title">تأكيد الحذف</h3>
+            <p className="confirm-text">
+              هل أنت متأكد من حذف "<strong>{confirmDelete.name}</strong>"؟
+            </p>
+            <p className="confirm-warning">لا يمكن التراجع عن هذا الإجراء!</p>
+            <div className="confirm-buttons">
+              <button
+                className="confirm-btn-delete"
+                onClick={handleConfirmDelete}
+              >
+                نعم، احذف
+              </button>
+              <button
+                className="confirm-btn-cancel"
+                onClick={() => setConfirmDelete(null)}
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* مودال الإضافة/التعديل */}
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -204,10 +245,24 @@ export default function Categories() {
             </div>
 
             <div className="buttons">
-              <button className="btn-save" onClick={handleSave}>
-                حفظ
+              <button
+                className="btn-save"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <FaSpinner className="spinner-icon" /> جاري الحفظ...
+                  </>
+                ) : (
+                  "حفظ"
+                )}
               </button>
-              <button className="btn-close" onClick={closeModal}>
+              <button
+                className="btn-close"
+                onClick={closeModal}
+                disabled={saving}
+              >
                 إغلاق
               </button>
             </div>

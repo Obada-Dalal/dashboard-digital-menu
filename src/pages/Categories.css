@@ -1,31 +1,31 @@
 .header-categories {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding: 15px 20px;
-    background: var(--text-light);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-    flex-wrap: wrap;
-    gap: 15px;
-    direction: ltr;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 15px 20px;
+  background: var(--text-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  gap: 15px;
+  direction: ltr;
 }
 
 .header-categories .add-categories {
-    border: none;
-    padding: 12px 24px;
-    font-size: 15px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: var(--text-light);
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    box-shadow: var(--btn-shadow);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
+  border: none;
+  padding: 12px 24px;
+  font-size: 15px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: var(--text-light);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  box-shadow: var(--btn-shadow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
 }
 
 .header-categories .add-categories:hover {
@@ -111,7 +111,7 @@
 
 .box-cat .icons .delete,
 .box-cat .icons .edit {
-  font-size: 20px;
+  font-size: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -333,12 +333,124 @@
 .edit-categories-content {
   background-color: var(--text-light);
 }
-@media (max-width:600px) {
-  .box-cat{
+/* ===== مودال تأكيد الحذف ===== */
+.confirm-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 35px 30px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: confirmIn 0.3s ease-out;
+}
+
+@keyframes confirmIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirm-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #fef3c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+.confirm-title {
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin: 0 0 10px;
+  direction: rtl;
+}
+
+.confirm-text {
+  color: #64748b;
+  margin: 0 0 8px;
+  direction: rtl;
+  font-size: 15px;
+}
+
+.confirm-warning {
+  color: #dc2626;
+  font-size: 13px;
+  margin: 0 0 25px;
+  direction: rtl;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-btn-delete {
+  flex: 1;
+  padding: 12px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.confirm-btn-delete:hover {
+  background: #b91c1c;
+}
+
+.confirm-btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: #e2e8f0;
+  color: #1f2937;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.confirm-btn-cancel:hover {
+  background: #cbd5e1;
+}
+
+/* ✨ Spinner */
+.spinner-icon {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-save:disabled,
+.btn-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@media (max-width: 600px) {
+  .box-cat {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 100%;
+    width: 47%;
   }
 }

@@ -1,14 +1,26 @@
 import { useEffect, useState, useRef } from "react";
 import api from "../services/api";
+import toast from "react-hot-toast";
 import "./products.css";
 import { MdDeleteForever } from "react-icons/md";
-import { FaImage, FaEdit, FaPlus, FaTimes } from "react-icons/fa";
+import {
+  FaImage,
+  FaEdit,
+  FaPlus,
+  FaTimes,
+  FaSpinner,
+  FaExclamationTriangle
+} from "react-icons/fa";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("الكل");
+  const [saving, setSaving] = useState(false);
+
+  // ✨ حالات مودال التأكيد
+  const [confirmDelete, setConfirmDelete] = useState(null); // اسم المنتج المراد حذفه
 
   const sliderRef = useRef(null);
   const isDown = useRef(false);
@@ -24,8 +36,9 @@ export default function Products() {
         ]);
         setProducts(prodRes.data);
         setCategories(catRes.data);
+        // eslint-disable-next-line no-unused-vars
       } catch (err) {
-        console.error(err);
+        toast.error("فشل في تحميل البيانات");
       } finally {
         setLoading(false);
       }
@@ -71,14 +84,22 @@ export default function Products() {
     isDown.current = false;
   };
 
-  const handleDelete = async (productName) => {
-    if (!window.confirm(`هل أنت متأكد من حذف ${productName}؟`)) return;
+  // ✨ فتح مودال التأكيد
+  const handleDeleteClick = (productName) => {
+    setConfirmDelete(productName);
+  };
+
+  // ✨ تأكيد الحذف
+  const handleConfirmDelete = async () => {
     try {
-      await api.delete(`/products/${encodeURIComponent(productName)}`);
-      setProducts((prev) => prev.filter((p) => p.name !== productName));
+      await api.delete(`/products/${encodeURIComponent(confirmDelete)}`);
+      setProducts((prev) => prev.filter((p) => p.name !== confirmDelete));
+      toast.success(`تم حذف "${confirmDelete}" بنجاح`);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      console.error("فشل في حذف المنتج:", err);
-      alert("لم يتم حذف المنتج، حاول مرة أخرى");
+      toast.error("فشل في حذف المنتج");
+    } finally {
+      setConfirmDelete(null);
     }
   };
 
@@ -93,7 +114,7 @@ export default function Products() {
   const [categoriesList, setCategoriesList] = useState([]);
   const [ingredientsList, setIngredientsList] = useState([]);
   const [newIngredient, setNewIngredient] = useState("");
-  const [isAvailable, setIsAvailable] = useState(true); // ✨ جديد
+  const [isAvailable, setIsAvailable] = useState(true);
   const [fileInputKey, setFileInputKey] = useState(0);
 
   const openAddModal = async () => {
@@ -106,15 +127,15 @@ export default function Products() {
     setSelectedCategory("");
     setIngredientsList([]);
     setNewIngredient("");
-    setIsAvailable(true); // ✨ افتراضي متاح
+    setIsAvailable(true);
     setFileInputKey((prev) => prev + 1);
-
     try {
       const res = await api.get("/categories");
       setCategoriesList(res.data);
       if (res.data.length > 0) setSelectedCategory(res.data[0].name);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      console.error("فشل جلب التصنيفات", err);
+      toast.error("فشل جلب التصنيفات");
     }
   };
 
@@ -128,14 +149,14 @@ export default function Products() {
     setImageFile(null);
     setIngredientsList(product.ingredients || []);
     setNewIngredient("");
-    setIsAvailable(product.isAvailable !== false); // ✨ تحميل الحالة
+    setIsAvailable(product.isAvailable !== false);
     setFileInputKey((prev) => prev + 1);
-
     try {
       const res = await api.get("/categories");
       setCategoriesList(res.data);
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      console.error("فشل جلب التصنيفات", err);
+      toast.error("فشل جلب التصنيفات");
     }
   };
 
@@ -175,32 +196,21 @@ export default function Products() {
     const nameStr = String(name).trim();
     const priceStr = String(price).trim();
     const catStr = String(selectedCategory).trim();
-
-    if (!nameStr) {
-      alert("الرجاء إدخال اسم المنتج");
-      return;
-    }
-    if (!priceStr) {
-      alert("الرجاء إدخال سعر صحيح");
-      return;
-    }
-    if (!catStr) {
-      alert("الرجاء اختيار تصنيف");
-      return;
-    }
-    if (!editingProduct && !imageFile) {
-      alert("الرجاء اختيار صورة للمنتج");
-      return;
-    }
+    if (!nameStr) return toast.error("الرجاء إدخال اسم المنتج");
+    if (!priceStr) return toast.error("الرجاء إدخال سعر صحيح");
+    if (!catStr) return toast.error("الرجاء اختيار تصنيف");
+    if (!editingProduct && !imageFile)
+      return toast.error("الرجاء اختيار صورة للمنتج");
 
     const formData = new FormData();
     formData.append("name", nameStr);
     formData.append("price", Number(priceStr));
     formData.append("categoryName", catStr);
     formData.append("ingredients", JSON.stringify(ingredientsList));
-    formData.append("isAvailable", isAvailable); // ✨ إرسال الحالة
+    formData.append("isAvailable", isAvailable);
     if (imageFile) formData.append("image", imageFile);
 
+    setSaving(true);
     try {
       if (editingProduct) {
         const res = await api.put(`/products/${editingProduct._id}`, formData, {
@@ -209,16 +219,19 @@ export default function Products() {
         setProducts((prev) =>
           prev.map((p) => (p._id === editingProduct._id ? res.data : p))
         );
+        toast.success("تم تعديل المنتج بنجاح");
       } else {
         const res = await api.post("/products", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         setProducts((prev) => [...prev, res.data]);
+        toast.success("تم إضافة المنتج بنجاح");
       }
       closeModal();
     } catch (err) {
-      console.error(err);
-      alert("فشل في حفظ المنتج: " + (err.response?.data?.error || err.message));
+      toast.error(err.response?.data?.error || "فشل في حفظ المنتج");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -227,6 +240,7 @@ export default function Products() {
 
   return (
     <div>
+      {/* ... باقي المحتوى زي ما هو ... */}
       <div className="header-products">
         <h2 className="page-title-products">
           المنتجات ({filteredProducts.length})
@@ -267,7 +281,6 @@ export default function Products() {
       <div className="main-products">
         {filteredProducts.map((p) => (
           <div className="box-product" key={p._id || p.name}>
-            {/* ✨ شارة الحالة */}
             <span
               className={`availability-badge ${p.isAvailable !== false ? "available" : "unavailable"}`}
             >
@@ -295,7 +308,7 @@ export default function Products() {
               </button>
               <button
                 className="delete-product"
-                onClick={() => handleDelete(p.name)}
+                onClick={() => handleDeleteClick(p.name)}
               >
                 <MdDeleteForever />
               </button>
@@ -309,9 +322,41 @@ export default function Products() {
         )}
       </div>
 
+      {/* ✨ مودال تأكيد الحذف */}
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={() => setConfirmDelete(null)}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirm-icon">
+              <FaExclamationTriangle />
+            </div>
+            <h3 className="confirm-title">تأكيد الحذف</h3>
+            <p className="confirm-text">
+              هل أنت متأكد من حذف "<strong>{confirmDelete}</strong>"؟
+            </p>
+            <p className="confirm-warning">لا يمكن التراجع عن هذا الإجراء!</p>
+            <div className="confirm-buttons">
+              <button
+                className="confirm-btn-delete"
+                onClick={handleConfirmDelete}
+              >
+                نعم، احذف
+              </button>
+              <button
+                className="confirm-btn-cancel"
+                onClick={() => setConfirmDelete(null)}
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* مودال الإضافة/التعديل */}
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            {/* ... نفس محتوى المودال السابق ... */}
             <div className="modal-header">
               <h3>{editingProduct ? "تعديل المنتج" : "إضافة منتج جديد"}</h3>
               <button className="modal-close-btn" onClick={closeModal}>
@@ -365,7 +410,6 @@ export default function Products() {
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-
             <div className="form-group">
               <label>السعر (SY):</label>
               <input
@@ -375,7 +419,6 @@ export default function Products() {
                 onChange={(e) => setPrice(e.target.value)}
               />
             </div>
-
             <div className="form-group">
               <label>التصنيف:</label>
               <select
@@ -426,7 +469,6 @@ export default function Products() {
               )}
             </div>
 
-            {/* ✨ checkbox الحالة */}
             <div className="form-group checkbox-group">
               <label>
                 <input
@@ -439,10 +481,24 @@ export default function Products() {
             </div>
 
             <div className="modal-buttons">
-              <button className="btn-save" onClick={handleSave}>
-                حفظ
+              <button
+                className="btn-save"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <FaSpinner className="spinner-icon" /> جاري الحفظ...
+                  </>
+                ) : (
+                  "حفظ"
+                )}
               </button>
-              <button className="btn-cancel" onClick={closeModal}>
+              <button
+                className="btn-cancel"
+                onClick={closeModal}
+                disabled={saving}
+              >
                 إلغاء
               </button>
             </div>
