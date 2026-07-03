@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
+import { FaHamburger, FaThLarge, FaStoreAlt } from "react-icons/fa";
 
 export default function Sidebar() {
   const menuItems = [
-    { path: "/admin-panel/products", label: "المنتجات", icon: "📦" },
-    { path: "/admin-panel/categories", label: "الأصناف", icon: "📂" },
-    { path: "/admin-panel/ads", label: "اللوغو", icon: "📢" },
-    // { path: "/admin-panel/orders", label: "الطلبات", icon: "🛒" }
+    { path: "/admin-panel/products", label: "المنتجات", icon: <FaHamburger /> },
+    { path: "/admin-panel/categories", label: "الأصناف", icon: <FaThLarge /> },
+    { path: "/admin-panel/ads", label: "اللوجو", icon: <FaStoreAlt /> }
   ];
 
   return (
