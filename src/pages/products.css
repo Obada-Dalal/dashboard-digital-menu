@@ -879,7 +879,7 @@
 }
 
 /* ✨ عرض الأحجام في بطاقة المنتج */
-.product-sizes-preview {
+/* .product-sizes-preview {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
@@ -893,4 +893,4 @@
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
-}
+} */

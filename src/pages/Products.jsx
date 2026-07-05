@@ -439,7 +439,7 @@ export default function Products() {
                   ))}
                 </div>
               )}
-              {p.sizes && p.sizes.length > 0 && (
+              {/* {p.sizes && p.sizes.length > 0 && (
                 <div className="product-sizes-preview">
                   {p.sizes.map((s, i) => (
                     <span key={i} className="size-tag">
@@ -447,7 +447,7 @@ export default function Products() {
                     </span>
                   ))}
                 </div>
-              )}
+              )} */}
               <span>{p.price} SY</span>
             </div>
             <div className="buttons-product">
