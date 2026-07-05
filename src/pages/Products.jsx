@@ -9,7 +9,8 @@ import {
   FaPlus,
   FaTimes,
   FaSpinner,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaCheck
 } from "react-icons/fa";
 
 export default function Products() {
@@ -110,10 +111,16 @@ export default function Products() {
   const [ingredientsList, setIngredientsList] = useState([]);
   const [newIngredient, setNewIngredient] = useState("");
 
-  // ✨ أحجام: حالات جديدة
-  const [sizesList, setSizesList] = useState([]); // [{ name, price }]
+  // ✨ حالات التعديل على المكونات
+  const [editIngredientIndex, setEditIngredientIndex] = useState(null);
+
+  // ✨ أحجام
+  const [sizesList, setSizesList] = useState([]);
   const [newSizeName, setNewSizeName] = useState("");
   const [newSizePrice, setNewSizePrice] = useState("");
+
+  // ✨ حالات التعديل على الأحجام
+  const [editSizeIndex, setEditSizeIndex] = useState(null);
 
   const [isAvailable, setIsAvailable] = useState(true);
   const [fileInputKey, setFileInputKey] = useState(0);
@@ -124,9 +131,11 @@ export default function Products() {
     setSelectedCategory("");
     setIngredientsList([]);
     setNewIngredient("");
+    setEditIngredientIndex(null);
     setSizesList([]);
     setNewSizeName("");
     setNewSizePrice("");
+    setEditSizeIndex(null);
     setIsAvailable(true);
     setImageFile(null);
     setImagePreview("");
@@ -148,9 +157,6 @@ export default function Products() {
   };
 
   const openEditModal = async (product) => {
-    console.log("📦 المنتج المستلم:", product);
-    console.log("📦 sizes:", product.sizes);
-    console.log("📦 نوع sizes:", Array.isArray(product.sizes));
     setEditingProduct(product);
     setShowModal(true);
     setName(product.name);
@@ -160,10 +166,11 @@ export default function Products() {
     setImageFile(null);
     setIngredientsList(product.ingredients || []);
     setNewIngredient("");
-    // ✨ تحميل الأحجام الموجودة
+    setEditIngredientIndex(null);
     setSizesList(product.sizes || []);
     setNewSizeName("");
     setNewSizePrice("");
+    setEditSizeIndex(null);
     setIsAvailable(product.isAvailable !== false);
     setFileInputKey((prev) => prev + 1);
     try {
@@ -188,27 +195,68 @@ export default function Products() {
     }
   };
 
-  // إدارة المكونات
+  // ============ إدارة المكونات ============
+
   const addIngredient = () => {
     const trimmed = newIngredient.trim();
-    if (trimmed && !ingredientsList.includes(trimmed)) {
-      setIngredientsList([...ingredientsList, trimmed]);
-      setNewIngredient("");
-    }
+    if (!trimmed) return;
+    if (ingredientsList.includes(trimmed))
+      return toast.error("المكون مضاف بالفعل");
+    setIngredientsList([...ingredientsList, trimmed]);
+    setNewIngredient("");
   };
 
   const removeIngredient = (index) => {
     setIngredientsList(ingredientsList.filter((_, i) => i !== index));
+    if (editIngredientIndex === index) {
+      cancelEditIngredient();
+    }
+  };
+
+  // ✨ بدء تعديل مكون
+  const startEditIngredient = (index) => {
+    setEditIngredientIndex(index);
+    setNewIngredient(ingredientsList[index]);
+  };
+
+  // ✨ تأكيد تعديل مكون
+  const confirmEditIngredient = () => {
+    const trimmed = newIngredient.trim();
+    if (!trimmed) return toast.error("المكون لا يمكن أن يكون فارغاً");
+
+    // التحقق من عدم تكرار الاسم (إذا تغير)
+    if (
+      trimmed !== ingredientsList[editIngredientIndex] &&
+      ingredientsList.includes(trimmed)
+    ) {
+      return toast.error("المكون مضاف بالفعل");
+    }
+
+    const updated = [...ingredientsList];
+    updated[editIngredientIndex] = trimmed;
+    setIngredientsList(updated);
+    cancelEditIngredient();
+  };
+
+  // ✨ إلغاء تعديل مكون
+  const cancelEditIngredient = () => {
+    setEditIngredientIndex(null);
+    setNewIngredient("");
   };
 
   const handleIngredientKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      addIngredient();
+      if (editIngredientIndex !== null) {
+        confirmEditIngredient();
+      } else {
+        addIngredient();
+      }
     }
   };
 
-  // ✨ إدارة الأحجام
+  // ============ إدارة الأحجام ============
+
   const addSize = () => {
     const nameTrimmed = newSizeName.trim();
     const priceNum = Number(newSizePrice);
@@ -217,7 +265,6 @@ export default function Products() {
     if (!newSizePrice || isNaN(priceNum) || priceNum <= 0)
       return toast.error("الرجاء إدخال سعر صحيح للحجم");
 
-    // التحقق من عدم تكرار اسم الحجم
     if (sizesList.some((s) => s.name === nameTrimmed))
       return toast.error("هذا الحجم مضاف بالفعل");
 
@@ -228,14 +275,60 @@ export default function Products() {
 
   const removeSize = (index) => {
     setSizesList(sizesList.filter((_, i) => i !== index));
+    if (editSizeIndex === index) {
+      cancelEditSize();
+    }
+  };
+
+  // ✨ بدء تعديل حجم
+  const startEditSize = (index) => {
+    setEditSizeIndex(index);
+    setNewSizeName(sizesList[index].name);
+    setNewSizePrice(sizesList[index].price);
+  };
+
+  // ✨ تأكيد تعديل حجم
+  const confirmEditSize = () => {
+    const nameTrimmed = newSizeName.trim();
+    const priceNum = Number(newSizePrice);
+
+    if (!nameTrimmed) return toast.error("الرجاء إدخال اسم الحجم");
+    if (!newSizePrice || isNaN(priceNum) || priceNum <= 0)
+      return toast.error("الرجاء إدخال سعر صحيح للحجم");
+
+    // التحقق من التكرار (إذا تغير الاسم)
+    if (
+      nameTrimmed !== sizesList[editSizeIndex].name &&
+      sizesList.some((s) => s.name === nameTrimmed)
+    ) {
+      return toast.error("هذا الحجم مضاف بالفعل");
+    }
+
+    const updated = [...sizesList];
+    updated[editSizeIndex] = { name: nameTrimmed, price: priceNum };
+    setSizesList(updated);
+    cancelEditSize();
+  };
+
+  // ✨ إلغاء تعديل حجم
+  const cancelEditSize = () => {
+    setEditSizeIndex(null);
+    setNewSizeName("");
+    setNewSizePrice("");
   };
 
   const handleSizeKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      addSize();
+      if (editSizeIndex !== null) {
+        confirmEditSize();
+      } else {
+        addSize();
+      }
     }
   };
+
+  // ============ حفظ المنتج ============
 
   const handleSave = async () => {
     const nameStr = String(name).trim();
@@ -281,6 +374,7 @@ export default function Products() {
       setSaving(false);
     }
   };
+
   if (loading)
     return <div className="loading-text">جاري تحميل المنتجات...</div>;
 
@@ -345,7 +439,6 @@ export default function Products() {
                   ))}
                 </div>
               )}
-              {/* ✨ عرض الأحجام في بطاقة المنتج */}
               {p.sizes && p.sizes.length > 0 && (
                 <div className="product-sizes-preview">
                   {p.sizes.map((s, i) => (
@@ -487,30 +580,66 @@ export default function Products() {
               </select>
             </div>
 
-            {/* قسم المكونات */}
+            {/* ============ قسم المكونات ============ */}
             <div className="form-group">
               <label>المكونات:</label>
               <div className="ingredients-input-row">
                 <input
                   type="text"
-                  placeholder="أدخل مكون واضغط Enter"
+                  placeholder={
+                    editIngredientIndex !== null
+                      ? "عدّل المكون..."
+                      : "أدخل مكون واضغط Enter"
+                  }
                   value={newIngredient}
                   onChange={(e) => setNewIngredient(e.target.value)}
                   onKeyDown={handleIngredientKeyDown}
+                  className={
+                    editIngredientIndex !== null ? "editing-active" : ""
+                  }
                 />
-                <button
-                  type="button"
-                  className="btn-add-ingredient"
-                  onClick={addIngredient}
-                >
-                  <FaPlus />
-                </button>
+                {editIngredientIndex !== null ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-confirm-edit"
+                      onClick={confirmEditIngredient}
+                    >
+                      <FaCheck />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-cancel-edit"
+                      onClick={cancelEditIngredient}
+                    >
+                      <FaTimes />
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-add-ingredient"
+                    onClick={addIngredient}
+                  >
+                    <FaPlus />
+                  </button>
+                )}
               </div>
               {ingredientsList.length > 0 && (
                 <div className="ingredients-tags">
                   {ingredientsList.map((ing, index) => (
-                    <span key={index} className="ingredient-tag editable">
+                    <span
+                      key={index}
+                      className={`ingredient-tag editable ${editIngredientIndex === index ? "editing" : ""}`}
+                    >
                       {ing}
+                      <button
+                        type="button"
+                        className="btn-edit-ingredient"
+                        onClick={() => startEditIngredient(index)}
+                      >
+                        <FaEdit />
+                      </button>
                       <button
                         type="button"
                         className="btn-remove-ingredient"
@@ -524,7 +653,7 @@ export default function Products() {
               )}
             </div>
 
-            {/* ✨✨✨ قسم الأحجام ✨✨✨ */}
+            {/* ============ قسم الأحجام ============ */}
             <div className="form-group">
               <label>الأحجام والأسعار (اختياري):</label>
               <div className="sizes-input-row">
@@ -534,7 +663,7 @@ export default function Products() {
                   value={newSizeName}
                   onChange={(e) => setNewSizeName(e.target.value)}
                   onKeyDown={handleSizeKeyDown}
-                  className="size-name-input"
+                  className={`size-name-input ${editSizeIndex !== null ? "editing-active" : ""}`}
                 />
                 <input
                   type="number"
@@ -542,21 +671,50 @@ export default function Products() {
                   value={newSizePrice}
                   onChange={(e) => setNewSizePrice(e.target.value)}
                   onKeyDown={handleSizeKeyDown}
-                  className="size-price-input"
+                  className={`size-price-input ${editSizeIndex !== null ? "editing-active" : ""}`}
                 />
-                <button
-                  type="button"
-                  className="btn-add-size"
-                  onClick={addSize}
-                >
-                  <FaPlus />
-                </button>
+                {editSizeIndex !== null ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn-confirm-edit"
+                      onClick={confirmEditSize}
+                    >
+                      <FaCheck />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-cancel-edit"
+                      onClick={cancelEditSize}
+                    >
+                      <FaTimes />
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-add-size"
+                    onClick={addSize}
+                  >
+                    <FaPlus />
+                  </button>
+                )}
               </div>
               {sizesList.length > 0 && (
                 <div className="sizes-tags">
                   {sizesList.map((s, index) => (
-                    <span key={index} className="size-tag editable">
+                    <span
+                      key={index}
+                      className={`size-tag editable ${editSizeIndex === index ? "editing" : ""}`}
+                    >
                       {s.name}: {s.price} SY
+                      <button
+                        type="button"
+                        className="btn-edit-size"
+                        onClick={() => startEditSize(index)}
+                      >
+                        <FaEdit />
+                      </button>
                       <button
                         type="button"
                         className="btn-remove-size"

@@ -692,6 +692,113 @@
   }
 }
 
+/* ✨ أيقونة تعديل المكون */
+.btn-edit-ingredient {
+  background: none;
+  border: none;
+  color: #1e40af;
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.btn-edit-ingredient:hover {
+  background: #fbbf24;
+  color: #1e40af;
+}
+
+/* ✨ علامة المكون في وضع التعديل */
+.ingredient-tag.editable.editing {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  color: #92400e;
+}
+
+/* ✨ أيقونة تعديل الحجم */
+.btn-edit-size {
+  background: none;
+  border: none;
+  color: #065f46;
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.btn-edit-size:hover {
+  background: #fbbf24;
+  color: #065f46;
+}
+
+/* ✨ علامة الحجم في وضع التعديل */
+.size-tag.editable.editing {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  color: #92400e;
+}
+
+/* ✨ input في وضع التعديل */
+.editing-active {
+  border-color: #f59e0b !important;
+  background: #fffbeb !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important;
+}
+
+/* ✨ زر تأكيد التعديل */
+.btn-confirm-edit {
+  background: #16a34a;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  flex-shrink: 0;
+}
+
+.btn-confirm-edit:hover {
+  background: #15803d;
+}
+
+/* ✨ زر إلغاء التعديل */
+.btn-cancel-edit {
+  background: #dc2626;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  flex-shrink: 0;
+}
+
+.btn-cancel-edit:hover {
+  background: #b91c1c;
+}
+
 /* ✨✨✨ تنسيقات قسم الأحجام ✨✨✨ */
 
 /* صف إدخال الأحجام */
@@ -747,6 +854,7 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
+  direction: rtl;
 }
 
 .btn-remove-size {
