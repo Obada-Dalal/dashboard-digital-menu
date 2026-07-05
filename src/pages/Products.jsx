@@ -19,8 +19,7 @@ export default function Products() {
   const [selectedFilter, setSelectedFilter] = useState("الكل");
   const [saving, setSaving] = useState(false);
 
-  // ✨ حالات مودال التأكيد
-  const [confirmDelete, setConfirmDelete] = useState(null); // اسم المنتج المراد حذفه
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   const sliderRef = useRef(null);
   const isDown = useRef(false);
@@ -84,12 +83,8 @@ export default function Products() {
     isDown.current = false;
   };
 
-  // ✨ فتح مودال التأكيد
-  const handleDeleteClick = (productName) => {
-    setConfirmDelete(productName);
-  };
+  const handleDeleteClick = (productName) => setConfirmDelete(productName);
 
-  // ✨ تأكيد الحذف
   const handleConfirmDelete = async () => {
     try {
       await api.delete(`/products/${encodeURIComponent(confirmDelete)}`);
@@ -114,21 +109,34 @@ export default function Products() {
   const [categoriesList, setCategoriesList] = useState([]);
   const [ingredientsList, setIngredientsList] = useState([]);
   const [newIngredient, setNewIngredient] = useState("");
+
+  // ✨ أحجام: حالات جديدة
+  const [sizesList, setSizesList] = useState([]); // [{ name, price }]
+  const [newSizeName, setNewSizeName] = useState("");
+  const [newSizePrice, setNewSizePrice] = useState("");
+
   const [isAvailable, setIsAvailable] = useState(true);
   const [fileInputKey, setFileInputKey] = useState(0);
 
-  const openAddModal = async () => {
-    setEditingProduct(null);
-    setShowModal(true);
-    setImageFile(null);
-    setImagePreview("");
+  const resetForm = () => {
     setName("");
     setPrice("");
     setSelectedCategory("");
     setIngredientsList([]);
     setNewIngredient("");
+    setSizesList([]);
+    setNewSizeName("");
+    setNewSizePrice("");
     setIsAvailable(true);
+    setImageFile(null);
+    setImagePreview("");
     setFileInputKey((prev) => prev + 1);
+  };
+
+  const openAddModal = async () => {
+    setEditingProduct(null);
+    setShowModal(true);
+    resetForm();
     try {
       const res = await api.get("/categories");
       setCategoriesList(res.data);
@@ -140,6 +148,9 @@ export default function Products() {
   };
 
   const openEditModal = async (product) => {
+    console.log("📦 المنتج المستلم:", product);
+    console.log("📦 sizes:", product.sizes);
+    console.log("📦 نوع sizes:", Array.isArray(product.sizes));
     setEditingProduct(product);
     setShowModal(true);
     setName(product.name);
@@ -149,6 +160,10 @@ export default function Products() {
     setImageFile(null);
     setIngredientsList(product.ingredients || []);
     setNewIngredient("");
+    // ✨ تحميل الأحجام الموجودة
+    setSizesList(product.sizes || []);
+    setNewSizeName("");
+    setNewSizePrice("");
     setIsAvailable(product.isAvailable !== false);
     setFileInputKey((prev) => prev + 1);
     try {
@@ -173,6 +188,7 @@ export default function Products() {
     }
   };
 
+  // إدارة المكونات
   const addIngredient = () => {
     const trimmed = newIngredient.trim();
     if (trimmed && !ingredientsList.includes(trimmed)) {
@@ -192,6 +208,35 @@ export default function Products() {
     }
   };
 
+  // ✨ إدارة الأحجام
+  const addSize = () => {
+    const nameTrimmed = newSizeName.trim();
+    const priceNum = Number(newSizePrice);
+
+    if (!nameTrimmed) return toast.error("الرجاء إدخال اسم الحجم");
+    if (!newSizePrice || isNaN(priceNum) || priceNum <= 0)
+      return toast.error("الرجاء إدخال سعر صحيح للحجم");
+
+    // التحقق من عدم تكرار اسم الحجم
+    if (sizesList.some((s) => s.name === nameTrimmed))
+      return toast.error("هذا الحجم مضاف بالفعل");
+
+    setSizesList([...sizesList, { name: nameTrimmed, price: priceNum }]);
+    setNewSizeName("");
+    setNewSizePrice("");
+  };
+
+  const removeSize = (index) => {
+    setSizesList(sizesList.filter((_, i) => i !== index));
+  };
+
+  const handleSizeKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addSize();
+    }
+  };
+
   const handleSave = async () => {
     const nameStr = String(name).trim();
     const priceStr = String(price).trim();
@@ -207,13 +252,15 @@ export default function Products() {
     formData.append("price", Number(priceStr));
     formData.append("categoryName", catStr);
     formData.append("ingredients", JSON.stringify(ingredientsList));
+    formData.append("sizes", JSON.stringify(sizesList));
     formData.append("isAvailable", isAvailable);
     if (imageFile) formData.append("image", imageFile);
 
     setSaving(true);
     try {
+      let res;
       if (editingProduct) {
-        const res = await api.put(`/products/${editingProduct._id}`, formData, {
+        res = await api.put(`/products/${editingProduct._id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         setProducts((prev) =>
@@ -221,7 +268,7 @@ export default function Products() {
         );
         toast.success("تم تعديل المنتج بنجاح");
       } else {
-        const res = await api.post("/products", formData, {
+        res = await api.post("/products", formData, {
           headers: { "Content-Type": "multipart/form-data" }
         });
         setProducts((prev) => [...prev, res.data]);
@@ -234,13 +281,11 @@ export default function Products() {
       setSaving(false);
     }
   };
-
   if (loading)
     return <div className="loading-text">جاري تحميل المنتجات...</div>;
 
   return (
     <div>
-      {/* ... باقي المحتوى زي ما هو ... */}
       <div className="header-products">
         <h2 className="page-title-products">
           المنتجات ({filteredProducts.length})
@@ -300,6 +345,16 @@ export default function Products() {
                   ))}
                 </div>
               )}
+              {/* ✨ عرض الأحجام في بطاقة المنتج */}
+              {p.sizes && p.sizes.length > 0 && (
+                <div className="product-sizes-preview">
+                  {p.sizes.map((s, i) => (
+                    <span key={i} className="size-tag">
+                      {s.name}: {s.price} SY
+                    </span>
+                  ))}
+                </div>
+              )}
               <span>{p.price} SY</span>
             </div>
             <div className="buttons-product">
@@ -322,7 +377,7 @@ export default function Products() {
         )}
       </div>
 
-      {/* ✨ مودال تأكيد الحذف */}
+      {/* مودال تأكيد الحذف */}
       {confirmDelete && (
         <div className="modal-overlay" onClick={() => setConfirmDelete(null)}>
           <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
@@ -356,7 +411,6 @@ export default function Products() {
       {showModal && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* ... نفس محتوى المودال السابق ... */}
             <div className="modal-header">
               <h3>{editingProduct ? "تعديل المنتج" : "إضافة منتج جديد"}</h3>
               <button className="modal-close-btn" onClick={closeModal}>
@@ -411,10 +465,10 @@ export default function Products() {
               />
             </div>
             <div className="form-group">
-              <label>السعر (SY):</label>
+              <label>السعر الأساسي (SY):</label>
               <input
                 type="number"
-                placeholder="أدخل السعر..."
+                placeholder="أدخل السعر الأساسي..."
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
@@ -433,6 +487,7 @@ export default function Products() {
               </select>
             </div>
 
+            {/* قسم المكونات */}
             <div className="form-group">
               <label>المكونات:</label>
               <div className="ingredients-input-row">
@@ -460,6 +515,52 @@ export default function Products() {
                         type="button"
                         className="btn-remove-ingredient"
                         onClick={() => removeIngredient(index)}
+                      >
+                        <FaTimes />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ✨✨✨ قسم الأحجام ✨✨✨ */}
+            <div className="form-group">
+              <label>الأحجام والأسعار (اختياري):</label>
+              <div className="sizes-input-row">
+                <input
+                  type="text"
+                  placeholder="اسم الحجم (مثال: وسط)"
+                  value={newSizeName}
+                  onChange={(e) => setNewSizeName(e.target.value)}
+                  onKeyDown={handleSizeKeyDown}
+                  className="size-name-input"
+                />
+                <input
+                  type="number"
+                  placeholder="السعر (SY)"
+                  value={newSizePrice}
+                  onChange={(e) => setNewSizePrice(e.target.value)}
+                  onKeyDown={handleSizeKeyDown}
+                  className="size-price-input"
+                />
+                <button
+                  type="button"
+                  className="btn-add-size"
+                  onClick={addSize}
+                >
+                  <FaPlus />
+                </button>
+              </div>
+              {sizesList.length > 0 && (
+                <div className="sizes-tags">
+                  {sizesList.map((s, index) => (
+                    <span key={index} className="size-tag editable">
+                      {s.name}: {s.price} SY
+                      <button
+                        type="button"
+                        className="btn-remove-size"
+                        onClick={() => removeSize(index)}
                       >
                         <FaTimes />
                       </button>

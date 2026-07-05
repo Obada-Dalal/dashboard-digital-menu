@@ -687,7 +687,102 @@
     gap: 5px;
     padding: 10px;
   }
-  .add-products{
+  .add-products {
     gap: 1px;
   }
+}
+
+/* ✨✨✨ تنسيقات قسم الأحجام ✨✨✨ */
+
+/* صف إدخال الأحجام */
+.sizes-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.size-name-input {
+  flex: 2;
+}
+
+.size-price-input {
+  flex: 1;
+}
+
+.btn-add-size {
+  background: var(--primary);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  flex-shrink: 0;
+}
+
+.btn-add-size:hover {
+  background: var(--accent);
+}
+
+/* علامات الأحجام في المودال */
+.sizes-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.size-tag.editable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #d1fae5;
+  color: #065f46;
+  padding: 6px 10px 6px 6px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-remove-size {
+  background: none;
+  border: none;
+  color: #065f46;
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.btn-remove-size:hover {
+  background: #065f46;
+  color: white;
+}
+
+/* ✨ عرض الأحجام في بطاقة المنتج */
+.product-sizes-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 8px 0;
+}
+
+.size-tag {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
 }
